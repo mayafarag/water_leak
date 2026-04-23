@@ -13,16 +13,15 @@ import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import StatusCard from '../components/StatusCard';
 import { useDeviceState } from '../hooks/useDeviceState';
-import { firestoreService, SensorReading } from '../services/firestoreService';
+import { firestoreService } from '../services/firestoreService';
 
 const Dashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { deviceState, loading, error, isOnline } = useDeviceState();
-  const [recentReadings, setRecentReadings] = useState<SensorReading[]>([]);
 
   useEffect(() => {
-    const unsubscribe = firestoreService.onReadingsChange((readings) => {
-      setRecentReadings(readings.slice(0, 10));
+    const unsubscribe = firestoreService.onReadingsChange(() => {
+      // Readings listener active for future features
     }, 10);
 
     return unsubscribe;

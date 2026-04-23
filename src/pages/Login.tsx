@@ -117,11 +117,8 @@ const Login: React.FC = () => {
           </form>
 
           <div className="text-center mt-6">
-            <p className="text-cyan-200">
-              Don't have an account?{' '}
-              <Link to="/signup" className="text-cyan-400 hover:text-cyan-300 font-semibold">
-                Sign up
-              </Link>
+            <p className="text-cyan-200 text-sm">
+              Contact administrator for access credentials
             </p>
           </div>
         </div>

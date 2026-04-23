@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Bell, Shield, Palette, Key } from 'lucide-react';
+import { User, Bell, Shield, Settings as SettingsIcon } from 'lucide-react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../contexts/AuthContext';
@@ -143,7 +143,7 @@ const Settings: React.FC = () => {
                 {/* System Settings */}
                 <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                   <div className="flex items-center space-x-3 mb-6">
-                    <Settings className="w-6 h-6 text-cyan-400" />
+                    <SettingsIcon className="w-6 h-6 text-cyan-400" />
                     <h3 className="text-xl font-semibold text-white">System Settings</h3>
                   </div>
 

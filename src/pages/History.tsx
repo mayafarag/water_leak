@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Calendar, Filter } from 'lucide-react';
+import { Download, Calendar } from 'lucide-react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { firestoreService, SensorReading, ControlLog } from '../services/firestoreService';

@@ -10,7 +10,7 @@ A professional IoT dashboard for monitoring water leaks and fire detection using
 - **Manual Control**: Remote valve control and emergency stop
 - **Alert System**: Real-time notifications for safety events
 - **Data History**: Comprehensive logging and analytics
-- **User Authentication**: Secure login and user management
+- **User Authentication**: Secure login (admin-managed accounts)
 
 ## Tech Stack
 
@@ -66,6 +66,7 @@ src/
 3. **Firebase Configuration**
    - Create a Firebase project at https://console.firebase.google.com/
    - Enable Authentication (Email/Password)
+   - **Important**: Manually add user accounts in Firebase Console → Authentication → Users
    - Enable Realtime Database
    - Enable Firestore Database
    - Update `src/services/firebase.ts` with your Firebase config

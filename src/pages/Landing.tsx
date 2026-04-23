@@ -24,19 +24,12 @@ const Landing: React.FC = () => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-x-4"
           >
             <Link
               to="/login"
-              className="px-6 py-2 bg-cyan-500 hover:bg-cyan-400 text-white rounded-lg transition-colors duration-200"
+              className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
             >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="px-6 py-2 border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-blue-900 rounded-lg transition-colors duration-200"
-            >
-              Sign Up
+              Access Dashboard
             </Link>
           </motion.div>
         </nav>
@@ -65,10 +58,10 @@ const Landing: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <Link
-              to="/signup"
+              to="/login"
               className="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
             >
-              Get Started
+              Access System
             </Link>
           </motion.div>
         </motion.div>

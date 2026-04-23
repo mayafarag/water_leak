@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, Power, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { useDeviceState } from '../hooks/useDeviceState';

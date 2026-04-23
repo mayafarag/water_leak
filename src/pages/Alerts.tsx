@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, CheckCircle, Clock, Filter } from 'lucide-react';
+import { CheckCircle, Clock, Filter } from 'lucide-react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { firestoreService, Alert } from '../services/firestoreService';
