@@ -28,22 +28,25 @@ const ForgotPassword: React.FC = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-cyan-800 to-teal-900 flex items-center justify-center p-4">
+      <div className="app-surface relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+        <div className="water-orbit pointer-events-none" />
+        <div className="water-waves pointer-events-none" />
+        <div className="app-grid pointer-events-none absolute inset-0" />
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
+          className="relative w-full max-w-md"
         >
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl text-center">
+          <div className="panel rounded-2xl p-8 text-center">
             <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-white mb-2">Check Your Email</h2>
-            <p className="text-cyan-200 mb-6">
+            <h2 className="text-3xl font-black text-white mb-2">Check Your Email</h2>
+            <p className="text-cyan-50/70 mb-6">
               We've sent a password reset link to <strong>{email}</strong>
             </p>
             <Link
               to="/login"
-              className="inline-block px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold rounded-lg transition-all duration-200"
+              className="accent-button px-6 py-3"
             >
               Back to Login
             </Link>
@@ -54,20 +57,23 @@ const ForgotPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-cyan-800 to-teal-900 flex items-center justify-center p-4">
+    <div className="app-surface relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+      <div className="water-orbit pointer-events-none" />
+      <div className="water-waves pointer-events-none" />
+      <div className="app-grid pointer-events-none absolute inset-0" />
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="relative w-full max-w-md"
       >
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
+        <div className="panel rounded-2xl p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-cyan-400 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <Mail className="w-8 h-8 text-blue-900" />
+            <div className="w-16 h-16 bg-slate-950 rounded-xl flex items-center justify-center mx-auto mb-4 text-white">
+              <Mail className="w-8 h-8" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-2">Reset Password</h2>
-            <p className="text-cyan-200">Enter your email to receive a reset link</p>
+            <h2 className="text-3xl font-black text-white mb-2">Reset Password</h2>
+            <p className="text-cyan-50/70">Enter your email to receive a reset link</p>
           </div>
 
           {error && (
@@ -83,16 +89,16 @@ const ForgotPassword: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-cyan-200 mb-2">
+              <label className="block text-sm font-semibold text-cyan-50/70 mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cyan-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+                  className="field pl-10"
                   placeholder="Enter your email"
                   required
                 />
@@ -102,7 +108,7 @@ const ForgotPassword: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="accent-button w-full py-3 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
@@ -111,7 +117,7 @@ const ForgotPassword: React.FC = () => {
           <div className="text-center mt-6">
             <Link
               to="/login"
-              className="inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors"
+              className="inline-flex items-center font-semibold text-orange-600 hover:text-orange-500 transition-colors"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Login

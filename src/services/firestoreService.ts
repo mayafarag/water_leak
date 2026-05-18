@@ -43,6 +43,14 @@ export interface ControlLog {
   details?: any;
 }
 
+export interface Device {
+  id?: string;
+  name: string;
+  deviceId: string;
+  location?: string;
+  addedAt: Timestamp;
+}
+
 class FirestoreService {
   // Readings
   async addReading(reading: Omit<SensorReading, 'id' | 'timestamp'>): Promise<void> {
@@ -140,6 +148,28 @@ class FirestoreService {
         ...doc.data(),
       } as ControlLog));
       callback(logs);
+    });
+  }
+
+  // Devices
+  async addDevice(device: Omit<Device, 'id' | 'addedAt'>): Promise<void> {
+    const devicesRef = collection(firestore, 'devices');
+    await addDoc(devicesRef, {
+      ...device,
+      addedAt: Timestamp.now(),
+    });
+  }
+
+  onDevicesChange(callback: (devices: Device[]) => void) {
+    const devicesRef = collection(firestore, 'devices');
+    const q = query(devicesRef, orderBy('addedAt', 'desc'));
+
+    return onSnapshot(q, (snapshot) => {
+      const devices = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      } as Device));
+      callback(devices);
     });
   }
 }

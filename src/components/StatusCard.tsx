@@ -22,13 +22,13 @@ const StatusCard: React.FC<StatusCardProps> = ({
   const getStatusColor = () => {
     switch (status) {
       case 'safe':
-        return 'from-green-500 to-emerald-500';
+        return 'bg-emerald-500';
       case 'warning':
-        return 'from-yellow-500 to-orange-500';
+        return 'bg-amber-500';
       case 'danger':
-        return 'from-red-500 to-pink-500';
+        return 'bg-red-500';
       default:
-        return 'from-gray-500 to-slate-500';
+        return 'bg-slate-500';
     }
   };
 
@@ -49,31 +49,33 @@ const StatusCard: React.FC<StatusCardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4 }}
       transition={{ duration: 0.5 }}
-      className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-200"
+      className="control-panel group relative overflow-hidden rounded-2xl p-5 transition-all duration-200 hover:border-cyan-100/45 hover:shadow-xl hover:shadow-cyan-950/20"
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className={`w-10 h-10 bg-gradient-to-r ${getStatusColor()} rounded-lg flex items-center justify-center`}>
-          <Icon className="w-5 h-5 text-white" />
+      <div className={`absolute inset-x-0 top-0 h-1 ${getStatusColor()}`} />
+      <div className="mb-5 flex items-center justify-between">
+        <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${getStatusColor()} text-white shadow-lg shadow-slate-900/10`}>
+          <Icon className="h-5 w-5" />
         </div>
-        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-          status === 'safe' ? 'bg-green-500/20 text-green-100' :
-          status === 'warning' ? 'bg-yellow-500/20 text-yellow-100' :
-          status === 'danger' ? 'bg-red-500/20 text-red-100' :
-          'bg-gray-500/20 text-gray-100'
+        <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+          status === 'safe' ? 'bg-emerald-300/20 text-emerald-100' :
+          status === 'warning' ? 'bg-amber-300/20 text-amber-100' :
+          status === 'danger' ? 'bg-red-300/20 text-red-100' :
+          'bg-cyan-100/10 text-cyan-100'
         }`}>
           {getStatusText()}
         </span>
       </div>
 
       <div>
-        <h3 className="text-sm font-medium text-cyan-200 mb-1">{title}</h3>
+        <h3 className="mb-1 text-sm font-semibold text-cyan-50/70">{title}</h3>
         <div className="flex items-baseline">
           {isLoading ? (
-            <div className="h-8 w-16 bg-white/20 rounded animate-pulse"></div>
+            <div className="h-8 w-24 animate-pulse rounded bg-cyan-100/20"></div>
           ) : (
-            <span className="text-2xl font-bold text-white">
-              {value}{unit && <span className="text-sm text-cyan-200 ml-1">{unit}</span>}
+            <span className="text-2xl font-black tracking-tight text-white">
+              {value}{unit && <span className="ml-1 text-sm font-semibold text-cyan-50/60">{unit}</span>}
             </span>
           )}
         </div>

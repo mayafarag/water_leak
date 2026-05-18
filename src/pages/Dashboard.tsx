@@ -7,10 +7,11 @@ import {
   Zap,
   Activity,
   Wifi,
-  WifiOff
+  WifiOff,
+  ShieldCheck,
+  TimerReset
 } from 'lucide-react';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
+import PageLayout from '../components/PageLayout';
 import StatusCard from '../components/StatusCard';
 import { useDeviceState } from '../hooks/useDeviceState';
 import { firestoreService } from '../services/firestoreService';
@@ -60,26 +61,66 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-cyan-800 to-teal-900">
-      <div className="flex">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-        <div className="flex-1 lg:ml-0">
-          <Header onMenuClick={() => setSidebarOpen(true)} />
-
-          <main className="p-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white mb-2">Dashboard</h2>
-                <p className="text-cyan-200">Real-time monitoring of your smart safety system</p>
+    <PageLayout
+      sidebarOpen={sidebarOpen}
+      onMenuClick={() => setSidebarOpen(true)}
+      onCloseSidebar={() => setSidebarOpen(false)}
+      title="Dashboard"
+      subtitle="Real-time monitoring of your smart safety system"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="mb-6 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+          <motion.div
+            whileHover={{ y: -3 }}
+            className="panel relative overflow-hidden rounded-3xl p-6"
+          >
+            <div className="absolute right-6 top-6 h-28 w-28 rounded-full bg-cyan-300/20 blur-2xl" />
+            <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-cyan-300/20 px-3 py-1 text-xs font-bold text-cyan-50 ring-1 ring-cyan-100/20">
+                  <ShieldCheck className="h-4 w-4 text-cyan-200" />
+                  {isOnline ? 'Protected and listening' : 'Device connection needs attention'}
+                </div>
+                <h3 className="text-2xl font-black tracking-tight text-white">System overview</h3>
+                <p className="mt-2 max-w-2xl text-sm text-cyan-50/70">
+                  Sensors, pressure, valves, and command state update live from the device.
+                </p>
               </div>
+              <div className="rounded-2xl border border-cyan-100/20 bg-white/10 p-4 text-left shadow-sm">
+                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-cyan-50/70">
+                  <TimerReset className="h-4 w-4" />
+                  Last update
+                </div>
+                <div className="text-xl font-black text-white">
+                  {deviceState ? new Date(deviceState.updatedAt).toLocaleTimeString() : 'Waiting'}
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
-              {/* Status Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          <motion.div
+            whileHover={{ y: -3 }}
+            className={`rounded-2xl border p-6 shadow-lg ${
+              isOnline
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-950'
+                : 'border-red-200 bg-red-50 text-red-950'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-wider opacity-70">Connection</p>
+                <h3 className="mt-1 text-3xl font-black">{isOnline ? 'Online' : 'Offline'}</h3>
+              </div>
+              {isOnline ? <Wifi className="h-10 w-10" /> : <WifiOff className="h-10 w-10" />}
+            </div>
+          </motion.div>
+        </div>
+
+              <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 <StatusCard
                   title="Leak Detection"
                   value={deviceState ? (deviceState.leakState === 0 ? 'No Leak' : 'Leak Detected') : 'Unknown'}
@@ -146,93 +187,89 @@ const Dashboard: React.FC = () => {
                 />
               </div>
 
-              {/* Live Data Section */}
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                <h3 className="text-xl font-semibold text-white mb-4">Live Sensor Data</h3>
+              <div className="control-panel rounded-3xl p-6">
+                <h3 className="mb-4 text-xl font-black text-white">Live Sensor Data</h3>
 
                 {error && (
-                  <div className="bg-red-500/20 border border-red-400 text-red-100 px-4 py-3 rounded-lg mb-4">
+                  <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
                     {error}
                   </div>
                 )}
 
                 {deviceState ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">Leak Sensor</div>
-                      <div className="text-lg font-semibold text-white">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Leak Sensor</div>
+                      <div className="text-lg font-bold text-white">
                         {deviceState.leakState === 0 ? 'No Leak (LOW)' : 'Leak Detected (HIGH)'}
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">Flame Sensor</div>
-                      <div className="text-lg font-semibold text-white">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Flame Sensor</div>
+                      <div className="text-lg font-bold text-white">
                         {deviceState.flameState === 0 ? 'No Fire (0)' : 'Fire Detected (1)'}
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">Pressure Raw</div>
-                      <div className="text-lg font-semibold text-white">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Pressure Raw</div>
+                      <div className="text-lg font-bold text-white">
                         {deviceState.pressureRaw}
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">Pressure (Bar)</div>
-                      <div className="text-lg font-semibold text-white">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Pressure (Bar)</div>
+                      <div className="text-lg font-bold text-white">
                         {deviceState.pressureBar.toFixed(2)} bar
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">Leak Valve</div>
-                      <div className="text-lg font-semibold text-white">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Leak Valve</div>
+                      <div className="text-lg font-bold text-white">
                         {deviceState.relayLeakState === 1 ? 'Open (HIGH)' : 'Closed (LOW)'}
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">Fire Valve</div>
-                      <div className="text-lg font-semibold text-white">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Fire Valve</div>
+                      <div className="text-lg font-bold text-white">
                         {deviceState.relayFireState === 1 ? 'Open (HIGH)' : 'Closed (LOW)'}
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">LED Status</div>
-                      <div className="text-lg font-semibold text-white">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">LED Status</div>
+                      <div className="text-lg font-bold text-white">
                         {deviceState.ledState === 1 ? 'ON' : 'OFF'}
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">Last Update</div>
-                      <div className="text-lg font-semibold text-white">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Last Update</div>
+                      <div className="text-lg font-bold text-white">
                         {new Date(deviceState.updatedAt).toLocaleTimeString()}
                       </div>
                     </div>
 
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <div className="text-sm text-cyan-200 mb-1">Device Status</div>
-                      <div className="text-lg font-semibold text-white">
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Device Status</div>
+                      <div className="text-lg font-bold text-white">
                         {isOnline ? 'Online' : 'Offline'}
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <div className="text-cyan-200">Waiting for device data...</div>
+                    <div className="text-cyan-50/70">Waiting for device data...</div>
                   </div>
                 )}
               </div>
             </motion.div>
-          </main>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
+          </PageLayout>
+        );
+      };
+      
+      export default Dashboard;
