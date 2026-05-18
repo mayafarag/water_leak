@@ -27,7 +27,7 @@ export const useDeviceState = () => {
     };
   }, [loading]);
 
-  const isOnline = deviceState ? deviceService.isDeviceOnline(deviceState.heartbeat) : false;
+  const isOnline = deviceState ? deviceService.isDeviceOnline(deviceState.updatedAt) : false;
 
   return {
     deviceState,

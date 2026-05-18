@@ -1,4 +1,4 @@
-import { ref, onValue, set, update, get } from 'firebase/database';
+import { ref, onValue, update, get } from 'firebase/database';
 import { database } from './firebase';
 
 export interface SensorData {
