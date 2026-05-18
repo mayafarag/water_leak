@@ -30,7 +30,7 @@ export interface CommandData {
 class DeviceService {
   private sensorsRef = ref(database, 'sensors');
   private controlsRef = ref(database, 'controls');
-  private combinedStateRef = ref(database, '');
+  private combinedStateRef = ref(database);
 
   // Listen to combined device state changes (sensors + controls)
   onDeviceStateChange(
