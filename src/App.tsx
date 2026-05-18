@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
@@ -13,14 +14,49 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 function AppContent() {
   const { loading, error } = useAuth();
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading) {
+        console.warn('Loading timeout - taking too long');
+        setLoadingTimeout(true);
+      }
+    }, 15000);
+
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  if (loadingTimeout && loading) {
+    return (
+      <div className="app-surface relative flex min-h-screen items-center justify-center overflow-hidden">
+        <div className="panel relative mx-4 w-full max-w-sm rounded-3xl p-8 text-center">
+          <h2 className="mb-4 text-2xl font-black text-yellow-50">Connection Timeout</h2>
+          <p className="text-yellow-50/70 mb-4">Taking longer than expected to connect</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="accent-button px-6 py-2 mt-4"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
       <div className="app-surface relative flex min-h-screen items-center justify-center overflow-hidden">
         <div className="panel relative mx-4 w-full max-w-sm rounded-3xl p-8 text-center">
-          <h2 className="mb-4 text-2xl font-black text-red-50">Error</h2>
-          <p className="text-red-50/70 mb-4">{error}</p>
-          <p className="text-xs text-red-50/50">Please check your internet connection and try again</p>
+          <h2 className="mb-4 text-2xl font-black text-red-50">Error Connecting</h2>
+          <p className="text-red-50/70 mb-4 text-sm">{error}</p>
+          <p className="text-xs text-red-50/50 mb-4">Check your internet connection</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="accent-button px-6 py-2"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );

@@ -28,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let timeoutId: NodeJS.Timeout;
     
     try {
       unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -39,13 +40,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError(error.message);
         setLoading(false);
       });
+
+      // Fallback timeout - ensure loading is set to false after 10 seconds
+      timeoutId = setTimeout(() => {
+        setLoading(false);
+        console.warn('Auth initialization timeout - proceeding without auth');
+      }, 10000);
     } catch (err) {
       console.error('Error setting up auth listener:', err);
       setError('Failed to initialize authentication');
       setLoading(false);
     }
 
-    return () => unsubscribe?.();
+    return () => {
+      unsubscribe?.();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
