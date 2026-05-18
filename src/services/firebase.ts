@@ -6,6 +6,7 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: "AIzaSyAMQVUOnYfLy7G7xYEFKEBNsC2hYbGTetE",
   authDomain: "smart-water-and-fire-detection.firebaseapp.com",
+  databaseURL: "https://smart-water-and-fire-detection-default-rtdb.firebaseio.com",
   projectId: "smart-water-and-fire-detection",
   storageBucket: "smart-water-and-fire-detection.firebasestorage.app",
   messagingSenderId: "414751061692",
