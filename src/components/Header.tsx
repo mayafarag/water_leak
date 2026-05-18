@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Waves, User, LogOut, Menu } from 'lucide-react';
+import { Waves, User, LogOut, Menu, Database } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
@@ -43,6 +43,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </div>
 
         <div className="flex items-center space-x-4">
+          <div className="hidden items-center space-x-2 rounded-full border border-emerald-200/30 bg-emerald-500/20 px-3 py-2 text-emerald-50/100 sm:flex">
+            <Database className="h-4 w-4" />
+            <span className="text-xs font-semibold">Firebase Live</span>
+          </div>
           <div className="hidden items-center space-x-2 rounded-full border border-cyan-100/20 bg-white/10 px-3 py-2 text-cyan-50/100 md:flex">
             <User className="h-4 w-4" />
             <span className="text-sm">{user?.email}</span>

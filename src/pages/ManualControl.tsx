@@ -13,6 +13,10 @@ const ManualControl: React.FC = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<{
+    command: any;
+    actionName: string;
+  } | null>(null);
 
   const sendCommand = async (command: any, actionName: string) => {
     if (!user) return;
@@ -44,8 +48,10 @@ const ManualControl: React.FC = () => {
     const command = valve === 'leak'
       ? { leakValveOverride: override }
       : { fireValveOverride: override };
-
-    sendCommand(command, `${override ? 'activate' : 'disable'} ${valve} valve override`);
+    
+    const actionName = `${override ? 'activate' : 'disable'} ${valve} valve override`;
+    setPendingAction({ command, actionName });
+    setShowConfirm(valve);
   };
 
   const handleEmergencyStop = () => {
@@ -153,11 +159,13 @@ const ManualControl: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="control-panel max-w-md rounded-2xl p-6 mx-4"
             >
-              <h3 className="text-xl font-black text-white mb-4">Confirm Action</h3>
+              <h3 className="text-xl font-black text-white mb-4">⚠️ Confirm Manual Control</h3>
               <p className="text-cyan-50/70 mb-6">
                 {showConfirm === 'emergency'
-                  ? 'This will activate all valve overrides. Are you sure?'
-                  : 'Are you sure you want to proceed with this action?'
+                  ? 'This will ACTIVATE ALL VALVE OVERRIDES. System will not automatically respond to sensors. Are you absolutely sure?'
+                  : showConfirm === 'leak'
+                  ? `This will ${pendingAction?.actionName.includes('activate') ? 'ACTIVATE' : 'DISABLE'} the LEAK valve override. Are you sure?`
+                  : `This will ${pendingAction?.actionName.includes('activate') ? 'ACTIVATE' : 'DISABLE'} the FIRE valve override. Are you sure?`
                 }
               </p>
               <div className="flex space-x-3">
@@ -165,16 +173,22 @@ const ManualControl: React.FC = () => {
                   onClick={() => {
                     if (showConfirm === 'emergency') {
                       handleEmergencyStop();
+                    } else if (pendingAction) {
+                      sendCommand(pendingAction.command, pendingAction.actionName);
                     }
                     setShowConfirm(null);
+                    setPendingAction(null);
                   }}
-                  className="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded-lg transition-colors"
+                  className="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded-lg transition-colors font-bold"
                 >
-                  Confirm
+                  {loading ? 'Sending...' : 'Confirm'}
                 </button>
                 <button
-                  onClick={() => setShowConfirm(null)}
-                  className="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors"
+                  onClick={() => {
+                    setShowConfirm(null);
+                    setPendingAction(null);
+                  }}
+                  className="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg transition-colors font-bold"
                 >
                   Cancel
                 </button>
