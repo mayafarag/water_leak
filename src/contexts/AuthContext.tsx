@@ -8,6 +8,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   loading: boolean;
+  error: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,13 +24,28 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    let unsubscribe: (() => void) | undefined;
+    
+    try {
+      unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
+        setLoading(false);
+        setError(null);
+      }, (error) => {
+        console.error('Firebase auth error:', error);
+        setError(error.message);
+        setLoading(false);
+      });
+    } catch (err) {
+      console.error('Error setting up auth listener:', err);
+      setError('Failed to initialize authentication');
       setLoading(false);
-    });
-    return unsubscribe;
+    }
+
+    return () => unsubscribe?.();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -50,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     resetPassword,
     loading,
+    error,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
