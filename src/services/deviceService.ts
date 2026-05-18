@@ -33,7 +33,10 @@ class DeviceService {
   private combinedStateRef = ref(database, '');
 
   // Listen to combined device state changes (sensors + controls)
-  onDeviceStateChange(callback: (state: DeviceState | null) => void) {
+  onDeviceStateChange(
+    callback: (state: DeviceState | null) => void,
+    onError?: (error: Error) => void
+  ) {
     return onValue(this.combinedStateRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -55,6 +58,8 @@ class DeviceService {
       } else {
         callback(null);
       }
+    }, (error) => {
+      onError?.(error);
     });
   }
 
@@ -83,7 +88,7 @@ class DeviceService {
 
   // Send control command to device
   async sendCommand(command: CommandData): Promise<void> {
-    const updates: any = {};
+    const updates: Record<string, boolean> = {};
     if (command.fireValveOverride !== undefined) {
       updates['controls/fireValveOverride'] = command.fireValveOverride;
     }

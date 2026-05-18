@@ -40,7 +40,7 @@ export interface ControlLog {
   userId: string;
   userEmail: string;
   timestamp: Timestamp;
-  details?: any;
+  details?: unknown;
 }
 
 export interface Device {
@@ -71,6 +71,9 @@ class FirestoreService {
         ...doc.data(),
       } as SensorReading));
       callback(readings);
+    }, (error) => {
+      console.error('Failed to subscribe to readings:', error);
+      callback([]);
     });
   }
 
@@ -113,6 +116,9 @@ class FirestoreService {
         ...doc.data(),
       } as Alert));
       callback(alerts);
+    }, (error) => {
+      console.error('Failed to subscribe to alerts:', error);
+      callback([]);
     });
   }
 
@@ -148,6 +154,9 @@ class FirestoreService {
         ...doc.data(),
       } as ControlLog));
       callback(logs);
+    }, (error) => {
+      console.error('Failed to subscribe to control logs:', error);
+      callback([]);
     });
   }
 
@@ -170,6 +179,9 @@ class FirestoreService {
         ...doc.data(),
       } as Device));
       callback(devices);
+    }, (error) => {
+      console.error('Failed to subscribe to devices:', error);
+      callback([]);
     });
   }
 }

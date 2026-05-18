@@ -36,13 +36,19 @@ const History: React.FC = () => {
     return daysDiff <= filterDays;
   });
 
-  const exportToCSV = (data: any[], filename: string) => {
-    const headers = Object.keys(data[0] || {});
+  const exportToCSV = (data: object[], filename: string) => {
+    const rows = data.map(row => row as Record<string, unknown>);
+    const headers = Object.keys(rows[0] || {});
     const csvContent = [
       headers.join(','),
-      ...data.map(row => headers.map(header => {
+      ...rows.map(row => headers.map(header => {
         const value = row[header];
-        if (value && typeof value.toDate === 'function') {
+        if (
+          value &&
+          typeof value === 'object' &&
+          'toDate' in value &&
+          typeof value.toDate === 'function'
+        ) {
           return value.toDate().toISOString();
         }
         return JSON.stringify(value);

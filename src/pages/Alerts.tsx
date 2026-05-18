@@ -4,10 +4,18 @@ import { AlertTriangle, CheckCircle, Clock, Droplets, Flame, Gauge, Filter } fro
 import PageLayout from '../components/PageLayout';
 import { firestoreService, Alert } from '../services/firestoreService';
 
+type AlertFilter = 'all' | 'active' | 'resolved';
+
 const Alerts: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [filter, setFilter] = useState<'all' | 'active' | 'resolved'>('active');
+  const [filter, setFilter] = useState<AlertFilter>('active');
+
+  const handleFilterChange = (value: string) => {
+    if (value === 'all' || value === 'active' || value === 'resolved') {
+      setFilter(value);
+    }
+  };
 
   useEffect(() => {
     const includeResolved = filter === 'all';
@@ -70,7 +78,7 @@ const Alerts: React.FC = () => {
             <Filter className="mr-2 inline h-5 w-5 text-slate-500" />
             <select
               value={filter}
-              onChange={(e) => setFilter(e.target.value as any)}
+              onChange={(e) => handleFilterChange(e.target.value)}
               className="field w-auto"
             >
               <option value="active">Active Alerts</option>

@@ -7,15 +7,30 @@ export const useDeviceState = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let didReceiveInitialState = false;
+
     const unsubscribe = deviceService.onDeviceStateChange((state) => {
+      didReceiveInitialState = true;
+      if (timeout) {
+        clearTimeout(timeout);
+      }
       setDeviceState(state);
       setLoading(false);
       setError(null);
+    }, (error) => {
+      didReceiveInitialState = true;
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      setDeviceState(null);
+      setLoading(false);
+      setError(error.message || 'Failed to connect to device');
     });
 
     // Set a timeout for initial load
-    const timeout = setTimeout(() => {
-      if (loading) {
+    timeout = setTimeout(() => {
+      if (!didReceiveInitialState) {
         setLoading(false);
         setError('Failed to connect to device');
       }
@@ -23,9 +38,11 @@ export const useDeviceState = () => {
 
     return () => {
       unsubscribe();
-      clearTimeout(timeout);
+      if (timeout) {
+        clearTimeout(timeout);
+      }
     };
-  }, [loading]);
+  }, []);
 
   const isOnline = deviceState ? deviceService.isDeviceOnline(deviceState.updatedAt) : false;
 

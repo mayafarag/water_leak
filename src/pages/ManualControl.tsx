@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import { useDeviceState } from '../hooks/useDeviceState';
-import { deviceService } from '../services/deviceService';
+import { CommandData, deviceService } from '../services/deviceService';
 import { firestoreService } from '../services/firestoreService';
 import { useAuth } from '../contexts/AuthContext';
+
+type ControlCommand = Omit<CommandData, 'issuedBy' | 'issuedAt'>;
 
 const ManualControl: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,19 +15,22 @@ const ManualControl: React.FC = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<{
-    command: any;
+    command: ControlCommand;
     actionName: string;
   } | null>(null);
 
-  const sendCommand = async (command: any, actionName: string) => {
+  const sendCommand = async (command: ControlCommand, actionName: string) => {
     if (!user) return;
 
     setLoading(actionName);
+    setError(null);
     try {
       await deviceService.sendCommand({
         ...command,
         issuedBy: user.email!,
+        issuedAt: Date.now(),
       });
 
       // Log the action
@@ -39,6 +44,7 @@ const ManualControl: React.FC = () => {
       setShowConfirm(null);
     } catch (error) {
       console.error('Failed to send command:', error);
+      setError(error instanceof Error ? error.message : 'Failed to send command');
     } finally {
       setLoading(null);
     }
@@ -128,6 +134,12 @@ const ManualControl: React.FC = () => {
             loadingAction={loading}
           />
         </div>
+
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* Emergency Stop */}
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 shadow-lg shadow-red-900/5">
