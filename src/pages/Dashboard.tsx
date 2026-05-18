@@ -30,30 +30,24 @@ const Dashboard: React.FC = () => {
 
   const getLeakStatus = () => {
     if (!deviceState) return 'unknown';
-    return deviceState.leakState === 0 ? 'safe' : 'danger';
+    return deviceState.sensors.leak ? 'danger' : 'safe';
   };
 
   const getFireStatus = () => {
     if (!deviceState) return 'unknown';
-    return deviceState.flameState === 0 ? 'safe' : 'danger';
+    return deviceState.sensors.fire ? 'danger' : 'safe';
   };
 
   const getPressureStatus = () => {
     if (!deviceState) return 'unknown';
-    // Assume safe if between 0-10 bar
-    const pressure = deviceState.pressureBar;
-    if (pressure < 0 || pressure > 10) return 'danger';
-    if (pressure > 8) return 'warning';
+    const status = deviceState.sensors.pressureStatus;
+    if (status === 'critical') return 'danger';
+    if (status === 'warning') return 'warning';
     return 'safe';
   };
 
-  const getValveStatus = (state: number) => {
-    return state === 1 ? 'Open' : 'Closed';
-  };
-
-  const getLedStatus = () => {
-    if (!deviceState) return 'unknown';
-    return deviceState.ledState === 1 ? 'On' : 'Off';
+  const getValveStatus = (isOverride: boolean) => {
+    return isOverride ? 'Open (Override)' : 'Auto Mode';
   };
 
   const getConnectionStatus = () => {
@@ -123,7 +117,7 @@ const Dashboard: React.FC = () => {
               <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 <StatusCard
                   title="Leak Detection"
-                  value={deviceState ? (deviceState.leakState === 0 ? 'No Leak' : 'Leak Detected') : 'Unknown'}
+                  value={deviceState ? (deviceState.sensors.leak ? 'Leak Detected' : 'No Leak') : 'Unknown'}
                   status={getLeakStatus()}
                   icon={Droplets}
                   isLoading={loading}
@@ -131,7 +125,7 @@ const Dashboard: React.FC = () => {
 
                 <StatusCard
                   title="Fire Detection"
-                  value={deviceState ? (deviceState.flameState === 0 ? 'No Fire' : 'Fire Detected') : 'Unknown'}
+                  value={deviceState ? (deviceState.sensors.fire ? 'Fire Detected' : 'No Fire') : 'Unknown'}
                   status={getFireStatus()}
                   icon={Flame}
                   isLoading={loading}
@@ -139,7 +133,7 @@ const Dashboard: React.FC = () => {
 
                 <StatusCard
                   title="Pressure"
-                  value={deviceState ? deviceState.pressureBar.toFixed(1) : '0.0'}
+                  value={deviceState ? deviceState.sensors.pressureBar.toFixed(1) : '0.0'}
                   status={getPressureStatus()}
                   icon={Gauge}
                   unit="bar"
@@ -147,33 +141,33 @@ const Dashboard: React.FC = () => {
                 />
 
                 <StatusCard
-                  title="Leak Valve"
-                  value={deviceState ? getValveStatus(deviceState.relayLeakState) : 'Unknown'}
-                  status={deviceState?.relayLeakState === 0 ? 'safe' : 'warning'}
+                  title="Leak Valve Override"
+                  value={deviceState ? getValveStatus(deviceState.controls.leakValveOverride) : 'Unknown'}
+                  status={deviceState?.controls.leakValveOverride ? 'warning' : 'safe'}
                   icon={Activity}
                   isLoading={loading}
                 />
 
                 <StatusCard
-                  title="Fire Valve"
-                  value={deviceState ? getValveStatus(deviceState.relayFireState) : 'Unknown'}
-                  status={deviceState?.relayFireState === 1 ? 'warning' : 'safe'}
+                  title="Fire Valve Override"
+                  value={deviceState ? getValveStatus(deviceState.controls.fireValveOverride) : 'Unknown'}
+                  status={deviceState?.controls.fireValveOverride ? 'warning' : 'safe'}
                   icon={Activity}
                   isLoading={loading}
                 />
 
                 <StatusCard
-                  title="Warning LED"
-                  value={deviceState ? getLedStatus() : 'Unknown'}
-                  status={deviceState?.ledState === 1 ? 'warning' : 'safe'}
+                  title="Pressure Alert"
+                  value={deviceState ? (deviceState.sensors.pressureAlert ? 'Alert Active' : 'Normal') : 'Unknown'}
+                  status={deviceState?.sensors.pressureAlert ? 'warning' : 'safe'}
                   icon={Zap}
                   isLoading={loading}
                 />
 
                 <StatusCard
-                  title="System Mode"
-                  value={deviceState ? deviceState.mode : 'Unknown'}
-                  status="safe"
+                  title="Pressure Status"
+                  value={deviceState ? deviceState.sensors.pressureStatus : 'Unknown'}
+                  status={getPressureStatus()}
                   icon={Activity}
                   isLoading={loading}
                 />
@@ -201,49 +195,49 @@ const Dashboard: React.FC = () => {
                     <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
                       <div className="mb-1 text-sm font-semibold text-cyan-50/60">Leak Sensor</div>
                       <div className="text-lg font-bold text-white">
-                        {deviceState.leakState === 0 ? 'No Leak (LOW)' : 'Leak Detected (HIGH)'}
+                        {deviceState.sensors.leak ? 'Leak Detected (HIGH)' : 'No Leak (LOW)'}
                       </div>
                     </div>
 
                     <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
-                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Flame Sensor</div>
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Fire Sensor</div>
                       <div className="text-lg font-bold text-white">
-                        {deviceState.flameState === 0 ? 'No Fire (0)' : 'Fire Detected (1)'}
-                      </div>
-                    </div>
-
-                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
-                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Pressure Raw</div>
-                      <div className="text-lg font-bold text-white">
-                        {deviceState.pressureRaw}
+                        {deviceState.sensors.fire ? 'Fire Detected (HIGH)' : 'No Fire (LOW)'}
                       </div>
                     </div>
 
                     <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
                       <div className="mb-1 text-sm font-semibold text-cyan-50/60">Pressure (Bar)</div>
                       <div className="text-lg font-bold text-white">
-                        {deviceState.pressureBar.toFixed(2)} bar
+                        {deviceState.sensors.pressureBar.toFixed(2)} bar
                       </div>
                     </div>
 
                     <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
-                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Leak Valve</div>
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Pressure Status</div>
                       <div className="text-lg font-bold text-white">
-                        {deviceState.relayLeakState === 1 ? 'Open (HIGH)' : 'Closed (LOW)'}
+                        {deviceState.sensors.pressureStatus.charAt(0).toUpperCase() + deviceState.sensors.pressureStatus.slice(1)}
                       </div>
                     </div>
 
                     <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
-                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Fire Valve</div>
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Pressure Alert</div>
                       <div className="text-lg font-bold text-white">
-                        {deviceState.relayFireState === 1 ? 'Open (HIGH)' : 'Closed (LOW)'}
+                        {deviceState.sensors.pressureAlert ? 'Active' : 'Inactive'}
                       </div>
                     </div>
 
                     <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
-                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">LED Status</div>
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Leak Valve Override</div>
                       <div className="text-lg font-bold text-white">
-                        {deviceState.ledState === 1 ? 'ON' : 'OFF'}
+                        {deviceState.controls.leakValveOverride ? 'Enabled (HIGH)' : 'Disabled (LOW)'}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-cyan-100/20 bg-cyan-950/25 p-4 transition-colors hover:bg-cyan-900/30">
+                      <div className="mb-1 text-sm font-semibold text-cyan-50/60">Fire Valve Override</div>
+                      <div className="text-lg font-bold text-white">
+                        {deviceState.controls.fireValveOverride ? 'Enabled (HIGH)' : 'Disabled (LOW)'}
                       </div>
                     </div>
 

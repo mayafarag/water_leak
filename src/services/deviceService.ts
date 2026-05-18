@@ -1,66 +1,112 @@
 import { ref, onValue, set, update, get } from 'firebase/database';
 import { database } from './firebase';
 
-export interface DeviceState {
-  leakState: number;
-  flameState: number;
-  pressureRaw: number;
+export interface SensorData {
+  fire: boolean;
+  leak: boolean;
+  pressureAlert: boolean;
   pressureBar: number;
-  relayLeakState: number;
-  relayFireState: number;
-  ledState: number;
-  mode: 'auto' | 'manual';
-  heartbeat: number;
+  pressureStatus: 'normal' | 'warning' | 'critical';
+}
+
+export interface ControlData {
+  fireValveOverride: boolean;
+  leakValveOverride: boolean;
+}
+
+export interface DeviceState {
+  sensors: SensorData;
+  controls: ControlData;
   updatedAt: number;
 }
 
 export interface CommandData {
-  relayLeakCommand?: 'open' | 'close';
-  relayFireCommand?: 'open' | 'close';
-  modeCommand?: 'auto' | 'manual';
-  emergencyStop?: boolean;
+  fireValveOverride?: boolean;
+  leakValveOverride?: boolean;
   issuedBy: string;
   issuedAt: number;
 }
 
 class DeviceService {
-  private deviceStateRef = ref(database, 'deviceState');
-  private commandsRef = ref(database, 'commands/latest');
+  private sensorsRef = ref(database, 'sensors');
+  private controlsRef = ref(database, 'controls');
+  private combinedStateRef = ref(database, '');
 
-  // Listen to device state changes
+  // Listen to combined device state changes (sensors + controls)
   onDeviceStateChange(callback: (state: DeviceState | null) => void) {
-    return onValue(this.deviceStateRef, (snapshot) => {
+    return onValue(this.combinedStateRef, (snapshot) => {
       const data = snapshot.val();
-      callback(data);
+      if (data) {
+        const deviceState: DeviceState = {
+          sensors: data.sensors || {
+            fire: false,
+            leak: false,
+            pressureAlert: false,
+            pressureBar: 0,
+            pressureStatus: 'normal',
+          },
+          controls: data.controls || {
+            fireValveOverride: false,
+            leakValveOverride: false,
+          },
+          updatedAt: Date.now(),
+        };
+        callback(deviceState);
+      } else {
+        callback(null);
+      }
     });
   }
 
   // Get current device state
   async getDeviceState(): Promise<DeviceState | null> {
-    const snapshot = await get(this.deviceStateRef);
-    return snapshot.val();
+    const snapshot = await get(this.combinedStateRef);
+    const data = snapshot.val();
+    if (data) {
+      return {
+        sensors: data.sensors || {
+          fire: false,
+          leak: false,
+          pressureAlert: false,
+          pressureBar: 0,
+          pressureStatus: 'normal',
+        },
+        controls: data.controls || {
+          fireValveOverride: false,
+          leakValveOverride: false,
+        },
+        updatedAt: Date.now(),
+      };
+    }
+    return null;
   }
 
-  // Send command to device
+  // Send control command to device
   async sendCommand(command: CommandData): Promise<void> {
-    await set(this.commandsRef, {
-      ...command,
-      issuedAt: Date.now(),
-    });
+    const updates: any = {};
+    if (command.fireValveOverride !== undefined) {
+      updates['controls/fireValveOverride'] = command.fireValveOverride;
+    }
+    if (command.leakValveOverride !== undefined) {
+      updates['controls/leakValveOverride'] = command.leakValveOverride;
+    }
+    await update(ref(database), updates);
   }
 
-  // Update device state (for testing or manual override)
-  async updateDeviceState(updates: Partial<DeviceState>): Promise<void> {
-    await update(this.deviceStateRef, {
-      ...updates,
-      updatedAt: Date.now(),
-    });
+  // Update sensor data (typically this comes from IoT device)
+  async updateSensorData(sensorUpdates: Partial<SensorData>): Promise<void> {
+    await update(this.sensorsRef, sensorUpdates);
   }
 
-  // Check if device is online (heartbeat within last 30 seconds)
-  isDeviceOnline(lastHeartbeat: number): boolean {
+  // Update controls
+  async updateControls(controlUpdates: Partial<ControlData>): Promise<void> {
+    await update(this.controlsRef, controlUpdates);
+  }
+
+  // Check if device is online (based on pressure data updates)
+  isDeviceOnline(lastUpdate: number): boolean {
     const now = Date.now();
-    return (now - lastHeartbeat) < 30000; // 30 seconds
+    return (now - lastUpdate) < 60000; // 60 seconds
   }
 }
 
