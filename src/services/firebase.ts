@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
-import { getFirestore } from 'firebase/firestore';
+import { getAuth, Auth } from 'firebase/auth';
+import { getDatabase, Database } from 'firebase/database';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAMQVUOnYfLy7G7xYEFKEBNsC2hYbGTetE",
@@ -12,21 +12,12 @@ const firebaseConfig = {
   appId: "1:414751061692:web:be92873e73ae58bc9402b9"
 };
 
-let app;
-let auth;
-let database;
-let firestore;
+const app = initializeApp(firebaseConfig);
+const auth: Auth = getAuth(app);
+const database: Database = getDatabase(app);
+const firestore: Firestore = getFirestore(app);
 
-try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  database = getDatabase(app);
-  firestore = getFirestore(app);
-  console.log('Firebase initialized successfully');
-} catch (error) {
-  console.error('Firebase initialization error:', error);
-  throw error;
-}
+console.log('Firebase initialized successfully');
 
 export { auth, database, firestore };
 export default app;
