@@ -9,6 +9,7 @@ interface StatusCardProps {
   icon: LucideIcon;
   unit?: string;
   isLoading?: boolean;
+  iconColor?: string;
 }
 
 const StatusCard: React.FC<StatusCardProps> = ({
@@ -17,7 +18,8 @@ const StatusCard: React.FC<StatusCardProps> = ({
   status,
   icon: Icon,
   unit,
-  isLoading = false
+  isLoading = false,
+  iconColor,
 }) => {
   const getStatusColor = () => {
     switch (status) {
@@ -55,7 +57,7 @@ const StatusCard: React.FC<StatusCardProps> = ({
     >
       <div className={`absolute inset-x-0 top-0 h-1 ${getStatusColor()}`} />
       <div className="mb-5 flex items-center justify-between">
-        <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${getStatusColor()} text-white shadow-lg shadow-slate-900/10`}>
+        <div className={`flex h-11 w-11 items-center justify-center rounded-lg ${iconColor ?? getStatusColor()} text-white shadow-lg shadow-slate-900/10`}>
           <Icon className="h-5 w-5" />
         </div>
         <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${

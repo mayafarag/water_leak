@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import { useDeviceState } from '../hooks/useDeviceState';
 import { CommandData, deviceService } from '../services/deviceService';
@@ -33,7 +32,6 @@ const ManualControl: React.FC = () => {
         issuedAt: Date.now(),
       });
 
-      // Log the action
       await firestoreService.addControlLog({
         action: actionName,
         userId: user.uid,
@@ -42,9 +40,9 @@ const ManualControl: React.FC = () => {
       });
 
       setShowConfirm(null);
-    } catch (error) {
-      console.error('Failed to send command:', error);
-      setError(error instanceof Error ? error.message : 'Failed to send command');
+    } catch (err) {
+      console.error('Failed to send command:', err);
+      setError(err instanceof Error ? err.message : 'Failed to send command');
     } finally {
       setLoading(null);
     }
@@ -54,17 +52,9 @@ const ManualControl: React.FC = () => {
     const command = valve === 'leak'
       ? { leakValveOverride: override }
       : { fireValveOverride: override };
-    
     const actionName = `${override ? 'activate' : 'disable'} ${valve} valve override`;
     setPendingAction({ command, actionName });
     setShowConfirm(valve);
-  };
-
-  const handleEmergencyStop = () => {
-    sendCommand({
-      leakValveOverride: true,
-      fireValveOverride: true
-    }, 'emergency stop - activate both overrides');
   };
 
   const ValveControlCard: React.FC<{
@@ -81,7 +71,7 @@ const ManualControl: React.FC = () => {
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
           isOverride ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700'
         }`}>
-          {isOverride ? 'Override Active' : 'Normal Operation'}
+          {isOverride ? 'Override Mode ON' : 'Normal Operation'}
         </span>
       </div>
       <div className="flex space-x-3">
@@ -116,7 +106,6 @@ const ManualControl: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Valve Controls */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           <ValveControlCard
             title="Leak Valve Override"
@@ -141,29 +130,6 @@ const ManualControl: React.FC = () => {
           </div>
         )}
 
-        {/* Emergency Stop */}
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 shadow-lg shadow-red-900/5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-black text-red-950 mb-2 flex items-center">
-                <AlertTriangle className="w-5 h-5 mr-2 text-red-400" />
-                Emergency Override
-              </h3>
-              <p className="text-red-700 text-sm">
-                Activate both valve overrides to immediately respond to emergencies
-              </p>
-            </div>
-            <button
-              onClick={() => setShowConfirm('emergency')}
-              disabled={loading === 'emergency stop - activate both overrides'}
-              className="rounded-lg bg-red-600 px-6 py-3 font-bold text-white transition-colors hover:bg-red-500 disabled:bg-slate-300 disabled:cursor-not-allowed"
-            >
-              {loading === 'emergency stop - activate both overrides' ? 'Activating...' : 'ACTIVATE OVERRIDES'}
-            </button>
-          </div>
-        </div>
-
-        {/* Confirmation Modal */}
         {showConfirm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <motion.div
@@ -173,9 +139,7 @@ const ManualControl: React.FC = () => {
             >
               <h3 className="text-xl font-black text-white mb-4">⚠️ Confirm Manual Control</h3>
               <p className="text-cyan-50/70 mb-6">
-                {showConfirm === 'emergency'
-                  ? 'This will ACTIVATE ALL VALVE OVERRIDES. System will not automatically respond to sensors. Are you absolutely sure?'
-                  : showConfirm === 'leak'
+                {showConfirm === 'leak'
                   ? `This will ${pendingAction?.actionName.includes('activate') ? 'ACTIVATE' : 'DISABLE'} the LEAK valve override. Are you sure?`
                   : `This will ${pendingAction?.actionName.includes('activate') ? 'ACTIVATE' : 'DISABLE'} the FIRE valve override. Are you sure?`
                 }
@@ -183,9 +147,7 @@ const ManualControl: React.FC = () => {
               <div className="flex space-x-3">
                 <button
                   onClick={() => {
-                    if (showConfirm === 'emergency') {
-                      handleEmergencyStop();
-                    } else if (pendingAction) {
+                    if (pendingAction) {
                       sendCommand(pendingAction.command, pendingAction.actionName);
                     }
                     setShowConfirm(null);

@@ -120,6 +120,7 @@ const Dashboard: React.FC = () => {
                   value={deviceState ? (deviceState.sensors.leak ? 'Leak Detected' : 'No Leak') : 'Unknown'}
                   status={getLeakStatus()}
                   icon={Droplets}
+                  iconColor="bg-blue-500"
                   isLoading={loading}
                 />
 
@@ -128,6 +129,7 @@ const Dashboard: React.FC = () => {
                   value={deviceState ? (deviceState.sensors.fire ? 'Fire Detected' : 'No Fire') : 'Unknown'}
                   status={getFireStatus()}
                   icon={Flame}
+                  iconColor="bg-red-500"
                   isLoading={loading}
                 />
 
