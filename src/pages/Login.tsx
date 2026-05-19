@@ -45,7 +45,7 @@ const Login: React.FC = () => {
               <Lock className="w-8 h-8" />
             </div>
             <h2 className="text-3xl font-black text-white mb-2">Welcome Back</h2>
-            <p className="text-cyan-50/70">Sign in to your Smart Water Safety dashboard</p>
+            <p className="text-cyan-50/70">Sign in to your HomeGuard dashboard</p>
           </div>
 
           {error && (

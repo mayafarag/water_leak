@@ -36,8 +36,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <Waves className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-lg font-black text-white sm:text-xl">Smart Water Safety</h1>
-              <p className="hidden text-xs font-medium text-cyan-50/70 sm:block">Leak detection, valves, and live pressure</p>
+              <h1 className="text-lg font-black text-white sm:text-xl">HomeGuard</h1>
+              <p className="hidden text-xs font-medium text-cyan-50/70 sm:block">Smart Water And Fire System</p>
             </div>
           </div>
         </div>

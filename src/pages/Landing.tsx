@@ -21,7 +21,8 @@ const Landing: React.FC = () => {
             <div className="w-10 h-10 bg-slate-950 rounded-lg flex items-center justify-center text-white">
               <Shield className="w-6 h-6" />
             </div>
-            <h1 className="text-2xl font-black text-white">Smart Water Safety</h1>
+            <h1 className="text-2xl font-black text-white">HomeGuard</h1>
+            <p className="text-xs text-cyan-50/60 mt-0.5">Smart Water And Fire System</p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, x: 50 }}
@@ -47,9 +48,9 @@ const Landing: React.FC = () => {
           className="text-center"
         >
           <h2 className="text-5xl md:text-7xl font-black text-white mb-6 text-balance drop-shadow-lg">
-            Smart Safety
+            HomeGuard
             <br />
-            <span className="text-cyan-200">Water Monitoring System</span>
+            <span className="text-cyan-200">Smart Water And Fire System</span>
           </h2>
           <p className="text-xl text-cyan-50/75 mb-8 max-w-2xl mx-auto">
             Advanced IoT solution for real-time water leak and fire detection.
@@ -135,7 +136,7 @@ const Landing: React.FC = () => {
       {/* Footer */}
       <footer className="container relative mx-auto px-6 py-8 border-t border-slate-200">
         <div className="text-center text-slate-500">
-          <p>&copy; 2024 Smart Water and Fire Detection System. Graduation Project.</p>
+          <p>&copy; 2024 HomeGuard – Smart Water And Fire System. Graduation Project.</p>
         </div>
       </footer>
     </div>
